@@ -308,7 +308,14 @@ User User::loggedOnUser()
 
 #else
 
-	char * envUser = getenv( "USER" );
+	char * envUser;
+	QProcess process;
+	//getloggedinuser shall return the username of the currently logged in user
+	//on kubuntu, this worked for me: ps ax -o user:20,cmd | awk '{if ($2 == "init" && $3 == "--user") {print $1}}'
+	process.start("bash -c \"getloggedinuser | tr -d '\\n'\"");
+	process.waitForFinished(-1);
+	QByteArray out = process.readAllStandardOutput();
+	envUser = out.data();
 
 #ifdef ITALC_HAVE_PWD_H
 	struct passwd * pw_entry = NULL;
